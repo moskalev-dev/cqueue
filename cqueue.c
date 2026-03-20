@@ -23,6 +23,9 @@ void    cq_free(cqueue* self);
 
 cqueue* cqueue_new(int item_size, int count)
 {
+    if(item_size <= 0 || count <= 0)
+        return NULL;
+
     cqueue* cq = (cqueue*)malloc(sizeof(cqueue));
 
     if(!cq)
@@ -65,7 +68,7 @@ cqueue* cqueue_new(int item_size, int count)
 
 cq_byte cq_push(cqueue *self, const void* item)
 {
-    if(!self)
+    if(!self || !self->cpriv || !item)
         return 1;
 
     /// Используем локальные переменные для лучшей
@@ -104,7 +107,7 @@ cq_byte cq_push(cqueue *self, const void* item)
 
 cq_byte cq_pop(cqueue *self, void* dst)
 {
-    if( !self )
+    if( !self || !self->cpriv || !dst )
         return 1;
 
     /// Используем локальные переменные для лучшей
@@ -128,9 +131,9 @@ cq_byte cq_pop(cqueue *self, void* dst)
 
 cq_byte cq_at(cqueue *self, void *dst, int n)
 {
-    if(self)
+    if(self && self->cpriv && dst && n >= 0)
     {
-        if( cq_size(self) <= n )
+        if( cq_size(self) <= (size_t)n )
             return 1;
 
         int pos = self->cpriv->rpos + n;
